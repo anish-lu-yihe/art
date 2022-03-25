@@ -21,3 +21,6 @@ class FuzzyARTgai(FuzzyART):
                 {}
                 """.format(old_prop, new_prop))
         return ispropvaried
+
+    def get_categorysize(self):
+        pass
