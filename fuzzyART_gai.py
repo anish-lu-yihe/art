@@ -26,5 +26,8 @@ class FuzzyARTgai(FuzzyART):
         featnum = self.w.shape[1] // 2
         return self.w[:, :featnum], 1 - self.w[:, featnum:]
 
+    def getcat_centre(self):
+        return np.add(*self.getcat_bipolars()) / 2
+
     def getcat_vertices(self):
         pass
