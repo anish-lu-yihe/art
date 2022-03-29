@@ -22,5 +22,9 @@ class FuzzyARTgai(FuzzyART):
                 """.format(old_prop, new_prop))
         return ispropvaried
 
-    def get_categorysize(self):
+    def getcat_bipolars(self):
+        featnum = self.w.shape[1] // 2
+        return self.w[:, :featnum], 1 - self.w[:, featnum:]
+
+    def getcat_vertices(self):
         pass
