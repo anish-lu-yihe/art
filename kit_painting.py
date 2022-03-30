@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.decomposition import PCA
+from scipy.spatial import ConvexHull
 
 
 class PaintPCA:
@@ -21,7 +22,7 @@ class PaintPCA:
 
     def tripole(self, ax, s_pole, n_pole):
         """
-        input: multiple pairs of s_pole and n_pole
+        input: multiple categorical pairs of s_pole and n_pole
         """
         pca_s, pca_n = [self.pca.transform(pole) for pole in (s_pole, n_pole)]
         pca_c = (pca_s + pca_n) / 2
@@ -29,3 +30,16 @@ class PaintPCA:
             c = next(ax._get_lines.prop_cycler)['color']
             ax.plot(*np.transpose([ps, pn]), color=c)
             ax.scatter(*pc, marker='o', s=200, facecolors='none', linewidths=2, edgecolors=c)
+
+    def boundary(self, ax, vertices):
+        """
+        input multiple categorical groups of vertices
+        """
+        for catidx, catvert in enumerate(vertices):
+            if (catvert[0] != catvert[1]).any():
+                pca_cv = self.pca.transform(catvert)
+                cathull = ConvexHull(pca_cv)
+                hullxy = np.append(cathull.vertices, cathull.vertices[0])
+                ax.plot(pca_cv[hullxy, 0], pca_cv[hullxy, 1], '--')
+            else:
+                print("Category {} is too small".format(catidx))
