@@ -16,4 +16,4 @@ def photo_pca_truth(data, label, ax):
     ax.set_title("true data")
     ax.legend()
 
-    return pca
+    return pca, pca_xy
