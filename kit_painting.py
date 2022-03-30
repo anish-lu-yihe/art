@@ -1,19 +1,26 @@
 import numpy as np
 from sklearn.decomposition import PCA
 
-def photo_pca_truth(data, label, ax):
+
+def scatter_pca(data, label, ax, pca=None):
     # PCA
-    pca_dim = 2
-    pca = PCA(n_components=pca_dim)
-    pca_xy = pca.fit_transform(data)
-    pca_msg = "Variance explained by first {} principal components: {}".format(pca_dim, pca.explained_variance_ratio_)
+    if pca is None:
+        pca_dim = 2
+        pca = PCA(n_components=pca_dim)
+        pca_data = pca.fit_transform(data)
+        pca_msg = "Variance explained by first {} principal components: {}".format(pca_dim, pca.explained_variance_ratio_)
+    else:
+        pca_data = pca.transform(data)
+        pca_msg = "PCA unchanged"
     print(pca_msg)
 
     # plot
     for cat in range(max(label) + 1):
         ptlb = "cat{}".format(cat)
-        ax.scatter(*np.where(label == cat, pca_xy.T, None), label=ptlb)
-    ax.set_title("true data")
+        ax.scatter(*np.where(label == cat, pca_data.T, None), label=ptlb)
     ax.legend()
 
-    return pca, pca_xy
+    return pca, pca_data
+
+
+
