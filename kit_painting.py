@@ -2,25 +2,21 @@ import numpy as np
 from sklearn.decomposition import PCA
 
 
-def scatter_pca(data, label, ax, pca=None):
-    # PCA
-    if pca is None:
+class PaintPCA:
+    def __init__(self, data_ref):
         pca_dim = 2
-        pca = PCA(n_components=pca_dim)
-        pca_data = pca.fit_transform(data)
-        pca_msg = "Variance explained by first {} principal components: {}".format(pca_dim, pca.explained_variance_ratio_)
-    else:
-        pca_data = pca.transform(data)
-        pca_msg = "PCA unchanged"
-    print(pca_msg)
+        self.pca = PCA(n_components=pca_dim)
+        self.pca_data_ref = self.pca.fit_transform(data_ref)
+        pca_msg = "Variance explained by first {} principal components: {}".format(pca_dim, self.pca.explained_variance_ratio_)
+        print(pca_msg)
 
-    # plot
-    for cat in range(max(label) + 1):
-        ptlb = "cat{}".format(cat)
-        ax.scatter(*np.where(label == cat, pca_data.T, None), label=ptlb)
-    ax.legend()
+    def scatter(self, ax, label, data_new=None):
+        if data_new is None:
+            pca_data = self.pca_data_ref
+        else:
+            pca_data = self.pca.transform(data_new)
 
-    return pca, pca_data
-
+        for cat in range(max(label) + 1):
+            ax.scatter(*np.where(label == cat, pca_data.T, None), label=cat)
 
 
