@@ -36,10 +36,11 @@ class PaintPCA:
         input multiple categorical groups of vertices
         """
         for catidx, catvert in enumerate(vertices):
-            if (catvert[0] != catvert[1]).any():
+            if np.allclose(catvert[0], catvert[1], atol=1e-15):
+                print("Category {} is too small".format(catidx))
+            else:
                 pca_cv = self.pca.transform(catvert)
                 cathull = ConvexHull(pca_cv)
                 hullxy = np.append(cathull.vertices, cathull.vertices[0])
                 ax.plot(pca_cv[hullxy, 0], pca_cv[hullxy, 1], '--')
-            else:
-                print("Category {} is too small".format(catidx))
+
