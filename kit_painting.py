@@ -19,6 +19,7 @@ class PaintPCA:
 
         for cat in range(max(cat_label) + 1):
             ax.scatter(*np.where(cat_label == cat, pca_data.T, None), label=cat)
+        ax.scatter(*np.where(cat_label == -1, pca_data.T, None), color='k', marker='^')
 
     def tripole(self, ax, s_pole, n_pole):
         """
