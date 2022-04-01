@@ -12,7 +12,7 @@ def load_data(dataset):
         labels = [0, 1, 2]
         catnum = len(labels)
         mean = rnd.uniform(size=(catnum, 2))
-        cov = [np.diag(d) for d in rnd.uniform(high=0.1, size=(catnum, 2))]
+        cov = [np.diag(d) for d in rnd.uniform(high=0.01, size=(catnum, 2))]
         catsize = 50
         label = np.repeat(labels, catsize)
         data = np.empty((0, 2))
