@@ -50,10 +50,11 @@ class FuzzyART:
         fuzzy_norm = l1_norm(fuzzy_weights)
         scores = fuzzy_norm / (self.gamma + l1_norm(self.w))
         threshold = fuzzy_norm / l1_norm(x) >= _rho
-        if np.all(threshold == False):
-            return -1
+        if np.any(threshold):
+            best_cat = np.argmax(scores * threshold.astype(int))
         else:
-            return np.argmax(scores * threshold.astype(int))
+            best_cat = -1
+        return best_cat
 
     def train(self, x, epochs=1, rho=None):
         """
@@ -93,6 +94,7 @@ class FuzzyART:
             categories[i] = self._match_category(sample, rho)
         return categories
 
+    # to be deprecated
     def _set_properties(self, alpha=None, gamma=None, rho=None):
         # log old properties
         old_prop = self.alpha, self.beta, self.gamma, self.rho
