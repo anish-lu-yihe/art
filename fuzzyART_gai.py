@@ -57,7 +57,16 @@ class FuzzyART:
             best_cat = -1
         return best_cat
 
-    def train(self, x, epochs=1, rho=None):
+    def _update_weight(self, category, sample, alpha):
+        if alpha is None:
+            _alpha = self.alpha
+        else:
+            _alpha = alpha
+        _beta = 1 - _alpha
+        w = self.w[category]
+        self.w[category] = _alpha * np.minimum(sample, w) + _beta * w
+
+    def train(self, x, epochs=1, rho=None, alpha=None):
         """
         :param x: 2d array of size (samples, features), where all features are
          in [0, 1]
@@ -77,8 +86,7 @@ class FuzzyART:
                 if category == -1:
                     self._add_category(sample)
                 else:
-                    w = self.w[category]
-                    self.w[category] = self.alpha * np.minimum(sample, w) + self.beta * w
+                    self._update_weight(category, sample, alpha)
         return self
 
     def test(self, x, rho=None):
