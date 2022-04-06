@@ -33,9 +33,10 @@ class FuzzyART:
 
     def _complement_code(self, x):
         if self.complement_coding:
-            return np.hstack((x, 1 - x))
+            _x = np.hstack((x, 1 - x))
         else:
-            return x
+            _x = x
+        return _x
 
     def _add_category(self, x):
         self.w = np.vstack((self.w, x))
