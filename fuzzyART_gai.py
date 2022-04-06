@@ -20,10 +20,10 @@ class FuzzyART:
         :param rho: vigilance [0,1]
         :param complement_coding: use complement coding scheme for inputs
         """
-        self.alpha = alpha  # learning rate
+        self.alpha = alpha  # default learning rate
         self.beta = 1 - alpha
-        self.gamma = gamma  # choice parameter
-        self.rho = rho  # vigilance
+        self.gamma = gamma  # default choice parameter
+        self.rho = rho  # default vigilance
         self.complement_coding = complement_coding
 
         self.w = None
@@ -40,17 +40,22 @@ class FuzzyART:
     def _add_category(self, x):
         self.w = np.vstack((self.w, x))
 
-    def _match_category(self, x):
+    def _match_category(self, x, rho):
+        if rho is None:
+            _rho = self.rho
+        else:
+            _rho = rho
+
         fuzzy_weights = np.minimum(x, self.w)
         fuzzy_norm = l1_norm(fuzzy_weights)
         scores = fuzzy_norm / (self.gamma + l1_norm(self.w))
-        threshold = fuzzy_norm / l1_norm(x) >= self.rho
+        threshold = fuzzy_norm / l1_norm(x) >= _rho
         if np.all(threshold == False):
             return -1
         else:
             return np.argmax(scores * threshold.astype(int))
 
-    def train(self, x, epochs=1):
+    def train(self, x, epochs=1, rho=None):
         """
         :param x: 2d array of size (samples, features), where all features are
          in [0, 1]
@@ -58,6 +63,7 @@ class FuzzyART:
         shuffled after each epoch
         :return: self
         """
+
         samples = self._complement_code(np.atleast_2d(x))
 
         if self.w is None:
@@ -65,26 +71,26 @@ class FuzzyART:
 
         for epoch in range(epochs):
             for sample in np.random.permutation(samples):
-                category = self._match_category(sample)
+                category = self._match_category(sample, rho)
                 if category == -1:
                     self._add_category(sample)
                 else:
                     w = self.w[category]
-                    self.w[category] = (self.alpha * np.minimum(sample, w) +
-                                        self.beta * w)
+                    self.w[category] = self.alpha * np.minimum(sample, w) + self.beta * w
         return self
 
-    def test(self, x):
+    def test(self, x, rho=None):
         """
         :param x: 2d array of size (samples, features), where all features are
          in [0, 1]
         :return: category IDs for each provided sample
         """
+
         samples = self._complement_code(np.atleast_2d(x))
 
         categories = np.zeros(len(samples))
         for i, sample in enumerate(samples):
-            categories[i] = self._match_category(sample)
+            categories[i] = self._match_category(sample, rho)
         return categories
 
     def _set_properties(self, alpha=None, gamma=None, rho=None):
