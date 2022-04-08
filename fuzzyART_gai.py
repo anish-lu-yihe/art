@@ -59,32 +59,8 @@ class FuzzyART:
         scores, threshold = self._score_category(x, rho)
         sort_idx = np.argsort(scores)
         best_idx = np.where(threshold[sort_idx], sort_idx, -1)
-        print(scores)
-        print(best_idx)
-
         best_cats = np.flip(best_idx[-self.match_num:])
-
-        print(best_cats)
-        print('----')
-        return best_cats[0]
-
-    def raw_match_category(self, x, rho):
-        if rho is None:
-            _rho = self.rho
-        else:
-            _rho = rho
-
-        fuzzy_weights = np.minimum(x, self.w)
-        fuzzy_norm = l1_norm(fuzzy_weights)
-        scores = fuzzy_norm / (self.gamma + l1_norm(self.w))
-        threshold = fuzzy_norm / l1_norm(x) >= _rho
-
-        if np.any(threshold):
-            best_cat = np.argmax(scores * threshold.astype(int))
-        else:
-            best_cat = -1
-        return best_cat
-
+        return best_cats
 
     def _update_weight(self, category, sample, alpha):
         if alpha is None:
@@ -111,7 +87,7 @@ class FuzzyART:
 
         for epoch in range(epochs):
             for sample in np.random.permutation(samples):
-                category = self._match_category(sample, rho)#[0]
+                category = self._match_category(sample, rho)[0]
                 if category == -1:
                     self._add_category(sample)
                 else:
