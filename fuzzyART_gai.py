@@ -56,12 +56,32 @@ class FuzzyART:
         return scores * threshold.astype(int)
 
     def _match_category(self, x, rho):
-        scores = self._score_category(x, rho)
-        best_idx = np.flip(np.argsort(scores))
-        best_cats = np.full(self.match_num, -1)
-        for j, idx in enumerate(best_idx):
-            best_cats[j] = idx
-        return best_cats
+    #    scores = self._score_category(x, rho)
+     #   best_idx = np.flip(np.argsort(scores))
+      #  print(scores)
+       # print(best_idx)
+        #print('----')
+
+        if rho is None:
+            _rho = self.rho
+        else:
+            _rho = rho
+    
+        fuzzy_weights = np.minimum(x, self.w)
+        fuzzy_norm = l1_norm(fuzzy_weights)
+        scores = fuzzy_norm / (self.gamma + l1_norm(self.w))
+        threshold = fuzzy_norm / l1_norm(x) >= _rho
+
+        if np.any(threshold):
+            best_cat = np.argmax(scores * threshold.astype(int))
+        else:
+            best_cat = -1
+        return best_cat
+
+#        best_cats = np.full(self.match_num, -1)
+ #       for j, idx in enumerate(best_idx):
+  #          best_cats[j] = idx
+   #     return best_cats
 
     def _update_weight(self, category, sample, alpha):
         if alpha is None:
@@ -88,7 +108,7 @@ class FuzzyART:
 
         for epoch in range(epochs):
             for sample in np.random.permutation(samples):
-                category = self._match_category(sample, rho)[-1]
+                category = self._match_category(sample, rho)#[0]
                 if category == -1:
                     self._add_category(sample)
                 else:
@@ -104,9 +124,9 @@ class FuzzyART:
 
         samples = self._complement_code(np.atleast_2d(x))
 
-        categories = np.zeros(len(samples))
+        categories = np.zeros((samples.shape[0], self.match_num))
         for i, sample in enumerate(samples):
-            categories[i] = self._match_category(sample, rho)[-1]
+            categories[i] = self._match_category(sample, rho)
         return categories
 
     # to be deprecated
