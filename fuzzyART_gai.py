@@ -26,6 +26,8 @@ class FuzzyART:
         self.rho = rho  # default vigilance
         self.complement_coding = complement_coding
 
+        self.match_num = 2 # number of best matching categories
+
         self.w = None
 
     def _init_weights(self, x):
@@ -41,7 +43,7 @@ class FuzzyART:
     def _add_category(self, x):
         self.w = np.vstack((self.w, x))
 
-    def _match_category(self, x, rho):
+    def _score_category(self, x, rho):
         if rho is None:
             _rho = self.rho
         else:
@@ -51,11 +53,15 @@ class FuzzyART:
         fuzzy_norm = l1_norm(fuzzy_weights)
         scores = fuzzy_norm / (self.gamma + l1_norm(self.w))
         threshold = fuzzy_norm / l1_norm(x) >= _rho
-        if np.any(threshold):
-            best_cat = np.argmax(scores * threshold.astype(int))
-        else:
-            best_cat = -1
-        return best_cat
+        return scores * threshold.astype(int)
+
+    def _match_category(self, x, rho):
+        scores = self._score_category(x, rho)
+        best_idx = np.flip(np.argsort(scores))
+        best_cats = np.full(self.match_num, -1)
+        for j, idx in enumerate(best_idx):
+            best_cats[j] = idx
+        return best_cats
 
     def _update_weight(self, category, sample, alpha):
         if alpha is None:
@@ -82,7 +88,7 @@ class FuzzyART:
 
         for epoch in range(epochs):
             for sample in np.random.permutation(samples):
-                category = self._match_category(sample, rho)
+                category = self._match_category(sample, rho)[-1]
                 if category == -1:
                     self._add_category(sample)
                 else:
@@ -100,7 +106,7 @@ class FuzzyART:
 
         categories = np.zeros(len(samples))
         for i, sample in enumerate(samples):
-            categories[i] = self._match_category(sample, rho)
+            categories[i] = self._match_category(sample, rho)[-1]
         return categories
 
     # to be deprecated
