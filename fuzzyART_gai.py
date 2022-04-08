@@ -68,7 +68,6 @@ class FuzzyART:
             best_cat = np.argmax(scores)
             if not threshold[best_cat]:
                 best_cat = -1
-        print(best_cat)
         return best_cat
 
     def _update_weight(self, category, sample, alpha):
