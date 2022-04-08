@@ -96,8 +96,10 @@ class FuzzyART:
 
         for epoch in range(epochs):
             for sample in np.random.permutation(samples):
-
-                category = self._match_category(sample, rho)[0]
+                if self.multi_match:
+                    category = self._match_category(sample, rho)[0]
+                else:
+                    category = self._match_category(sample, rho)
                 if category == -1:
                     self._add_category(sample)
                 else:
