@@ -21,7 +21,7 @@ class PaintPCA:
         if self.noPCA:
             transformed_data = data
         else:
-            transformed_data = self.pca.fit_transform(data)
+            transformed_data = self.pca.transform(data)
         return transformed_data
 
     def scatter(self, ax, cat_label, data_new=None):
