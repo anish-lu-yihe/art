@@ -19,7 +19,7 @@ def load_data(dataset):
         for m, c in zip(mean, cov):
             raw = np.random.multivariate_normal(m, c, size=catsize)
             pos = np.abs(raw)
-            data = np.append(data, pos, axis=0)
+            data = np.append(data, np.abs(1 - pos), axis=0)
 
     return data, label
 
