@@ -149,15 +149,16 @@ class FuzzyART:
                 """.format(old_prop, new_prop))
         return ispropvaried
 
-    def getcat_bipole(self):
+    def getcat_bipole(self, s=None):
         self.featnum = self.w.shape[1] // 2
-        return self.w[:, :self.featnum], 1 - self.w[:, self.featnum:]
+        _w = self._scale_weight(s)
+        return _w[:, :self.featnum], 1 - _w[:, self.featnum:]
 
     def getcat_centre(self):
         return np.add(*self.getcat_bipole()) / 2
 
-    def getcat_vertex(self):
-        u, v = self.getcat_bipole()
+    def getcat_vertex(self, s=None):
+        u, v = self.getcat_bipole(s)
         vertnum = 2 ** self.featnum
         vertices = np.zeros((self.w.shape[0], vertnum, self.featnum))
         for featidx in range(self.featnum):
