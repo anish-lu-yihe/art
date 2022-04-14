@@ -41,13 +41,13 @@ class FuzzyART:
             _x = x
         return _x
 
-    def _scale_weight(self, w, s=None):
+    def _scale_weight(self, s=None):
         if s is None:
-            _w = w
+            _w = self.w
         elif s <= 0.5:
-            u, vc = np.hsplit(w, 2)
+            u, vc = np.hsplit(self.w, 2)
             sDvu = s * (1 - vc - u)
-            _w = np.minimum(np.maximum(w + np.tile(sDvu, 2), 0), 1)
+            _w = np.minimum(np.maximum(self.w + np.tile(sDvu, 2), 0), 1)
         else:
             raise ValueError("Wrong scaling parameter!")
         return _w
