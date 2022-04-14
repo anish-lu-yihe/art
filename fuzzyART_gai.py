@@ -68,7 +68,7 @@ class FuzzyART:
         threshold = fuzzy_norm / l1_norm(x) >= _rho
         return scores, threshold
 
-    def _match_category(self, x, rho, s=None):
+    def _match_category(self, x, rho, s):
         scores, threshold = self._score_category(x, rho, s)
         if self.multi_match:
             sort_idx = np.argsort(scores)
@@ -91,7 +91,7 @@ class FuzzyART:
         w = self.w[category]
         self.w[category] = _alpha * np.minimum(sample, w) + _beta * w
 
-    def train(self, x, epochs=1, rho=None, alpha=None):
+    def train(self, x, epochs=1, rho=None, alpha=None, s=None):
         """
         :param x: 2d array of size (samples, features), where all features are
          in [0, 1]
@@ -108,16 +108,16 @@ class FuzzyART:
         for epoch in range(epochs):
             for sample in np.random.permutation(samples):
                 if self.multi_match:
-                    category = self._match_category(sample, rho)[0]
+                    category = self._match_category(sample, rho, s)[0]
                 else:
-                    category = self._match_category(sample, rho)
+                    category = self._match_category(sample, rho, s)
                 if category == -1:
                     self._add_category(sample)
                 else:
                     self._update_weight(category, sample, alpha)
         return self
 
-    def test(self, x, rho=None):
+    def test(self, x, rho=None, s=None):
         """
         :param x: 2d array of size (samples, features), where all features are
          in [0, 1]
@@ -128,7 +128,7 @@ class FuzzyART:
 
         categories = np.zeros((samples.shape[0], self.match_num))
         for i, sample in enumerate(samples):
-            categories[i] = self._match_category(sample, rho)
+            categories[i] = self._match_category(sample, rho, s)
         return categories
 
     # to be deprecated
