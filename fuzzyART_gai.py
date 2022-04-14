@@ -41,11 +41,11 @@ class FuzzyART:
             _x = x
         return _x
 
-    def _scale_weight(self, s=None):
+    def _scale_weight(self, s):
         if s is None:
             _w = self.w
         elif s <= 0.5:
-            u, vc = np.hsplit(self.w, 2)
+            u, vc = np.hsplit(self.w, 2)  # w = (u, v^c) where u and v are bipoles of hyperbox
             sDvu = s * (1 - vc - u)
             _w = np.minimum(np.maximum(self.w + np.tile(sDvu, 2), 0), 1)
         else:
@@ -55,20 +55,21 @@ class FuzzyART:
     def _add_category(self, x):
         self.w = np.vstack((self.w, x))
 
-    def _score_category(self, x, rho):
+    def _score_category(self, x, rho, s):
         if rho is None:
             _rho = self.rho
         else:
             _rho = rho
 
-        fuzzy_weights = np.minimum(x, self.w)
+        _w = self._scale_weight(s)
+        fuzzy_weights = np.minimum(x, _w)
         fuzzy_norm = l1_norm(fuzzy_weights)
-        scores = fuzzy_norm / (self.gamma + l1_norm(self.w))
+        scores = fuzzy_norm / (self.gamma + l1_norm(_w))
         threshold = fuzzy_norm / l1_norm(x) >= _rho
         return scores, threshold
 
-    def _match_category(self, x, rho):
-        scores, threshold = self._score_category(x, rho)
+    def _match_category(self, x, rho, s=None):
+        scores, threshold = self._score_category(x, rho, s)
         if self.multi_match:
             sort_idx = np.argsort(scores)
             best_idx = np.where(threshold[sort_idx], sort_idx, -1)
