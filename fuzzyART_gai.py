@@ -61,10 +61,9 @@ class FuzzyART:
         else:
             _rho = rho
 
-        _w = self._scale_weight(s)
-        fuzzy_weights = np.minimum(x, _w)
+        fuzzy_weights = np.minimum(x, self._scale_weight(s))
         fuzzy_norm = l1_norm(fuzzy_weights)
-        scores = fuzzy_norm / (self.gamma + l1_norm(_w))
+        scores = fuzzy_norm / (self.gamma + l1_norm(self.w))
         threshold = fuzzy_norm / l1_norm(x) >= _rho
         return scores, threshold
 
