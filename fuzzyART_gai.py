@@ -13,7 +13,7 @@ class FuzzyART:
     An unsupervised clustering algorithm
     """
 
-    def __init__(self, alpha=1.0, gamma=0.01, rho=0.5, complement_coding=True):
+    def __init__(self, alpha=1.0, gamma=0.01, rho=0.5, complement_coding=True, best_match_num=1):
         """
         :param alpha: learning rate [0,1]
         :param gamma: regularization term >0
@@ -26,7 +26,7 @@ class FuzzyART:
         self.rho = rho  # default vigilance
         self.complement_coding = complement_coding
 
-        self.match_num = 2  # number of best matching categories
+        self.match_num = best_match_num
         self.multi_match = self.match_num > 1
 
         self.w = None
@@ -76,9 +76,9 @@ class FuzzyART:
             cat_num = np.minimum(self.match_num, threshold.size)
             best_cat[:cat_num] = np.flip(best_idx[-cat_num:])
         else:
-            best_cat = np.argmax(scores)
+            best_cat = np.argmax(scores),
             if not threshold[best_cat]:
-                best_cat = -1
+                best_cat = -1,
         return best_cat
 
     def _update_weight(self, category, sample, alpha):
@@ -106,10 +106,7 @@ class FuzzyART:
 
         for epoch in range(epochs):
             for sample in np.random.permutation(samples):
-                if self.multi_match:
-                    category = self._match_category(sample, rho, s)[0]
-                else:
-                    category = self._match_category(sample, rho, s)
+                category = self._match_category(sample, rho, s)[0]
                 if category == -1:
                     self._add_category(sample)
                 else:
