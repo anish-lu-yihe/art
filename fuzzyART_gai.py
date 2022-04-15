@@ -81,14 +81,13 @@ class FuzzyART:
                 best_cat = -1,
         return best_cat
 
-    def _update_weight(self, category, sample, alpha):
+    def _expansion(self, category, sample, alpha):
         if alpha is None:
             _alpha = self.alpha
         else:
             _alpha = alpha
-        _beta = 1 - _alpha
         w = self.w[category]
-        self.w[category] = _alpha * np.minimum(sample, w) + _beta * w
+        self.w[category] = _alpha * np.minimum(sample, w) + (1 - _alpha) * w
 
     def _contraction(self, category, sample, beta):
         w = self.w[category]
@@ -115,7 +114,7 @@ class FuzzyART:
                 if category == -1:
                     self._add_category(sample)
                 else:
-                    self._update_weight(category, sample, alpha)
+                    self._expansion(category, sample, alpha)
         return self
 
     def test(self, x, rho=None, s=None):
