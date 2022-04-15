@@ -90,6 +90,11 @@ class FuzzyART:
         w = self.w[category]
         self.w[category] = _alpha * np.minimum(sample, w) + _beta * w
 
+    def _contraction(self, category, sample, beta):
+        w = self.w[category]
+        featidx = np.argmin(sample - w)
+        self.w[category, featidx] = beta * sample[featidx] + (1 - beta) * w[featidx]
+
     def train(self, x, epochs=1, rho=None, alpha=None, s=None):
         """
         :param x: 2d array of size (samples, features), where all features are
