@@ -30,11 +30,21 @@ def interp2coordinates(X, Y, N_interp):
     return np.transpose(z)[1:-1]
 
 
-def savefigure_datetime(figure, simname, dirname):
+def timestamp():
     from datetime import datetime
     now = datetime.now()
-    now_str = now.strftime("%Y-%m-%d_%H-%M-%S")
+    return now.strftime("%Y-%m-%d_%H-%M-%S"), datetime.timestamp(now)
 
-    filename = '{}/{}_{}'.format(dirname, now_str, simname)
+
+def savefigure_datetime(figure, simname, dirname):
+    import os
+    now_str, timestamp_float = timestamp()
+    timestamp_int = int(timestamp_float * 1e6)
+
+    if not os.path.exists(dirname):
+        os.mkdir(dirname)
+        print("Directory ", dirname, " Created ")
+
+    filename = '{}/{}_{}[{}]'.format(dirname, now_str, simname, timestamp_int)
     print("figure saved at", filename)
     figure.savefig(filename)
