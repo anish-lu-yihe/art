@@ -134,28 +134,6 @@ class FuzzyART:
             categories[i] = self._match_category(sample, rho, s)
         return categories
 
-    # to be deprecated
-    def _set_properties(self, alpha=None, gamma=None, rho=None):
-        # log old properties
-        old_prop = self.alpha, self.beta, self.gamma, self.rho
-        # update properties
-        ispropvaried = False
-        for propname, new_val in zip(('alpha', 'gamma', 'rho'), (alpha, gamma, rho)):
-            if self.__dict__[propname] != new_val and new_val is not None:
-                self.__dict__[propname] = new_val
-                ispropvaried = True
-        self.beta = 1 - self.alpha
-        # log new properties
-        new_prop = self.alpha, self.beta, self.gamma, self.rho
-        # message about update
-        if ispropvaried:
-            print("""
-                (alpha, beta, gamma, rho) - changed from\n
-                {} to\n
-                {}
-                """.format(old_prop, new_prop))
-        return ispropvaried
-
     def getcat_bipole(self, s=None):
         self.featnum = self.w.shape[1] // 2
         _w = self._scale_weight(s)
