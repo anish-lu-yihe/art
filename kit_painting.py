@@ -55,6 +55,7 @@ class PaintPCA:
             else:
                 pca_cv = self._transform(catvert)
                 cathull = ConvexHull(pca_cv)
+                # the above line may run into an error when all the points are on a line, not forming a convexhull
                 hullxy = np.append(cathull.vertices, cathull.vertices[0])
                 ax.plot(pca_cv[hullxy, 0], pca_cv[hullxy, 1], '--')
 
