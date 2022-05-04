@@ -89,9 +89,12 @@ class FuzzyART:
         w = self.w[category]
         self.w[category] = _alpha * np.minimum(sample, w) + (1 - _alpha) * w
 
-    def _contraction(self, category, sample, beta):
+    def _contraction(self, category, sample, beta, whichidx='least-loss'):
         w = self.w[category]
-        featidx = np.argmin(sample - w)
+        if whichidx == 'least-loss':  # index leading to least loss of categorical hyperbox area
+            featidx = np.argmin(sample - w)
+        elif whichidx == 'random':
+            featidx = np.random.randint(w.size)
         self.w[category, featidx] = beta * sample[featidx] + (1 - beta) * w[featidx]
 
     def train(self, x, epochs=1, rho=None, alpha=None, s=None):
