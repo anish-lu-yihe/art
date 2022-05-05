@@ -168,22 +168,24 @@ class FuzzyART:
             categories[i] = self._match_category(sample, rho, s)
         return categories
 
-    def replay(self, category, total_number, s, scheme='in-box'):
-        if scheme is None:
-            u, vc = np.split(np.min(self._scale_weight(s), axis=0), 2)
-            replay = self._resample_fromuv(u, 1 - vc, total_number)
+    def replay_null(self, total_number, s):
+        u, vc = np.split(np.min(self._scale_weight(s), axis=0), 2)
+        replay = self._resample_fromuv(u, 1 - vc, total_number)
+        return replay
+
+    def replay_1cat(self, category, total_number, s, scheme='in-box'):
+        allidx = np.atleast_1d(category)
+        replay_percat = total_number // allidx.size
+        replay = np.empty((0, self.featnum))
+        if scheme == 'in-box':
+            _resample = self._resample_category
+        elif scheme == 'vertex':
+            _resample = self._resample_vertex
         else:
-            allidx = np.atleast_1d(category)
-            replay_percat = total_number // allidx.size
-            replay = np.empty((0, self.featnum))
-            if scheme == 'in-box':
-                _resample = self._resample_category
-            elif scheme == 'vertex':
-                _resample = self._resample_vertex
-                vertices = self._getvx(s)
-            for catidx in allidx:
-                catreplay = _resample(catidx, replay_percat, s)
-                replay = np.vstack((replay, catreplay))
+            raise TypeError("Replay scheme does NOT exist!")
+        for catidx in allidx:
+            catreplay = _resample(catidx, replay_percat, s)
+            replay = np.vstack((replay, catreplay))
 
         return replay
 
