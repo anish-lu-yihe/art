@@ -1,6 +1,12 @@
 import numpy as np
 import sklearn.datasets as ds
+import sklearn.metrics.pairwise as mp
 import numpy.random as rnd
+
+
+def least_l1_to_data(test, data):
+    l1 = mp.manhattan_distances(test, data)
+    return np.min(l1, axis=1)
 
 
 def load_data(dataset):
