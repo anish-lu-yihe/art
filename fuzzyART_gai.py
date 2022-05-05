@@ -146,7 +146,8 @@ class FuzzyART:
 
     def getcat_bipole(self, s=None):
         _w = self._scale_weight(s)
-        return _w[:, :self.featnum], 1 - _w[:, self.featnum:]
+        _u, _vc = np.split(_w, 2, axis=1)
+        return _u, 1 - _vc
 
     def getcat_centre(self):
         return np.add(*self.getcat_bipole()) / 2
