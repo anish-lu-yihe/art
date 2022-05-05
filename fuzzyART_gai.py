@@ -143,7 +143,10 @@ class FuzzyART:
         return self._resample_fromuv(u, v, number)
 
     def replay(self, category, total_number, s, scheme='in-box'):
-        if scheme == 'in-box':
+        if scheme is None:
+            u, vc = np.split(np.min(self._scale_weight(s), axis=0), 2)
+            replay = self._resample_fromuv(u, 1 - vc, total_number)
+        elif scheme == 'in-box':
             allidx = np.atleast_1d(category)
             replay_percat = total_number // allidx.size
             replay = np.empty((0, self.featnum))
