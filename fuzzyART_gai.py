@@ -15,17 +15,19 @@ class FuzzyART:
 
     def __init__(self, feature_num, alpha=1.0, beta=1.0, gamma=1e-5, rho=0.5, best_match_num=1):
         """
+        :param feature_num: number of features
         :param alpha: learning rate [0,1]
+        :param beta: unlearning rate [0,1]
         :param gamma: regularization term >0
         :param rho: vigilance [0,1]
-        :param complement_coding: use complement coding scheme for inputs
+
+        complement coding scheme for inputs is always used
         """
         self.featnum = feature_num
         self.alpha = alpha  # default learning rate
         self.beta = beta  # default unlearning rate
         self.gamma = gamma  # default choice parameter
         self.rho = rho  # default vigilance
-        self.complement_coding = True
 
         self.match_num = best_match_num
         self.multi_match = self.match_num > 1
@@ -36,10 +38,7 @@ class FuzzyART:
         self.w = np.atleast_2d(x)
 
     def _complement_code(self, x):
-        if self.complement_coding:
-            _x = np.hstack((x, 1 - x))
-        else:
-            _x = x
+        _x = np.hstack((x, 1 - x))
         return _x
 
     def _scale_weight(self, s):
