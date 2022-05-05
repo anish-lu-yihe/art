@@ -171,12 +171,14 @@ class FuzzyART:
     def replay_null(self, total_number, s):
         u, vc = np.split(np.min(self._scale_weight(s), axis=0), 2)
         replay = self._resample_fromuv(u, 1 - vc, total_number)
-        return replay
+        label_exp = np.full(total_number, -1)
+        return replay, label_exp
 
     def replay_1cat(self, category, total_number, s, scheme='in-box'):
         allidx = np.atleast_1d(category)
         replay_percat = total_number // allidx.size
         replay = np.empty((0, self.featnum))
+        label_exp = np.empty((0, 0), dtype=int)
         if scheme == 'in-box':
             _resample = self._resample_category
         elif scheme == 'vertex':
@@ -186,8 +188,10 @@ class FuzzyART:
         for catidx in allidx:
             catreplay = _resample(catidx, replay_percat, s)
             replay = np.vstack((replay, catreplay))
+            label_exp = np.append(label_exp, np.full((catreplay.shape[0], 1), catidx))
 
-        return replay
+        randidx = np.random.permutation(replay.shape[0])
+        return replay[randidx], label_exp[randidx]
 
     # for external uses, maybe deprecated later
     def getcat_bipole(self, s=None):
