@@ -134,6 +134,16 @@ class FuzzyART:
             categories[i] = self._match_category(sample, rho, s)
         return categories
 
+    def _resample_category(self, category, number, s):
+        w = self.w[category]
+        featnum = w.size // 2
+        rand_init = np.random.rand(number, featnum)
+        u, vc = np.split(w, 2)  # can use .getcat_bipole()
+        return u + (1 - vc - u) * rand_init
+
+    def replay(self):
+        pass
+
     def getcat_bipole(self, s=None):
         self.featnum = self.w.shape[1] // 2
         _w = self._scale_weight(s)
