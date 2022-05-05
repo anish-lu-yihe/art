@@ -13,7 +13,7 @@ class FuzzyART:
     An unsupervised clustering algorithm
     """
 
-    def __init__(self, alpha=1.0, gamma=0.01, rho=0.5, complement_coding=True, best_match_num=1):
+    def __init__(self, alpha=1.0, beta=1.0, gamma=1e-5, rho=0.5, best_match_num=1):
         """
         :param alpha: learning rate [0,1]
         :param gamma: regularization term >0
@@ -21,10 +21,10 @@ class FuzzyART:
         :param complement_coding: use complement coding scheme for inputs
         """
         self.alpha = alpha  # default learning rate
-        self.beta = 1 - alpha
+        self.beta = beta  # default unlearning rate
         self.gamma = gamma  # default choice parameter
         self.rho = rho  # default vigilance
-        self.complement_coding = complement_coding
+        self.complement_coding = True
 
         self.match_num = best_match_num
         self.multi_match = self.match_num > 1
