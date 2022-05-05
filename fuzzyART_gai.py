@@ -13,13 +13,14 @@ class FuzzyART:
     An unsupervised clustering algorithm
     """
 
-    def __init__(self, alpha=1.0, beta=1.0, gamma=1e-5, rho=0.5, best_match_num=1):
+    def __init__(self, feature_num, alpha=1.0, beta=1.0, gamma=1e-5, rho=0.5, best_match_num=1):
         """
         :param alpha: learning rate [0,1]
         :param gamma: regularization term >0
         :param rho: vigilance [0,1]
         :param complement_coding: use complement coding scheme for inputs
         """
+        self.featnum = feature_num
         self.alpha = alpha  # default learning rate
         self.beta = beta  # default unlearning rate
         self.gamma = gamma  # default choice parameter
@@ -145,7 +146,6 @@ class FuzzyART:
         pass
 
     def getcat_bipole(self, s=None):
-        self.featnum = self.w.shape[1] // 2
         _w = self._scale_weight(s)
         return _w[:, :self.featnum], 1 - _w[:, self.featnum:]
 
