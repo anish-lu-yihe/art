@@ -126,6 +126,11 @@ class FuzzyART:
         u, v = [uv[category] for uv in self._getuv(s)]
         return self._resample_fromuv(u, v, number)
 
+    def _resample_vertex(self, category, number, s):
+        vertices = self._getvx(s)[category]
+        np.random.shuffle(vertices)
+        return vertices[:number]
+
     def train(self, x, epochs=1, rho=None, alpha=None, s=None):
         """
         :param x: 2d array of size (samples, features), where all features are
@@ -167,15 +172,19 @@ class FuzzyART:
         if scheme is None:
             u, vc = np.split(np.min(self._scale_weight(s), axis=0), 2)
             replay = self._resample_fromuv(u, 1 - vc, total_number)
-        elif scheme == 'in-box':
+        else:
             allidx = np.atleast_1d(category)
             replay_percat = total_number // allidx.size
             replay = np.empty((0, self.featnum))
+            if scheme == 'in-box':
+                _resample = self._resample_category
+            elif scheme == 'vertex':
+                _resample = self._resample_vertex
+                vertices = self._getvx(s)
             for catidx in allidx:
-                catreplay = self._resample_category(catidx, replay_percat, s)
+                catreplay = _resample(catidx, replay_percat, s)
                 replay = np.vstack((replay, catreplay))
-        elif scheme == 'vertex':
-            pass
+
         return replay
 
     # for external uses, maybe deprecated later
