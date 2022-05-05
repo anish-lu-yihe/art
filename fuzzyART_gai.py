@@ -60,6 +60,19 @@ class FuzzyART:
     def _getct(self):
         return np.mean(self._getuv(None), axis=0)
 
+    def _getvx(self, s):
+        u, v = self._getuv(s)
+        vertnum = 2 ** self.featnum
+        vertices = np.zeros((self.w.shape[0], vertnum, self.featnum))
+        for featidx in range(self.featnum):
+            stride = 2 ** featidx
+            uvidx = np.reshape(np.arange(vertnum), (stride, -1))
+            uidx, vidx = np.split(uvidx, 2, axis=1)
+            vertices[:, uidx.flatten(), featidx] = np.tile(u[:, featidx], (vertnum // 2, 1)).T
+            vertices[:, vidx.flatten(), featidx] = np.tile(v[:, featidx], (vertnum // 2, 1)).T
+
+        return vertices
+
     def _add_category(self, x):
         self.w = np.vstack((self.w, x))
 
@@ -173,16 +186,6 @@ class FuzzyART:
         return self._getct()
 
     def getcat_vertex(self, s=None):
-        u, v = self._getuv(s)
-        vertnum = 2 ** self.featnum
-        vertices = np.zeros((self.w.shape[0], vertnum, self.featnum))
-        for featidx in range(self.featnum):
-            stride = 2 ** featidx
-            uvidx = np.reshape(np.arange(vertnum), (stride, -1))
-            uidx, vidx = np.split(uvidx, 2, axis=1)
-            vertices[:, uidx.flatten(), featidx] = np.tile(u[:, featidx], (vertnum // 2, 1)).T
-            vertices[:, vidx.flatten(), featidx] = np.tile(v[:, featidx], (vertnum // 2, 1)).T
-
-        return vertices
+        return self._getvx(s)
 
 
