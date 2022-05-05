@@ -135,11 +135,9 @@ class FuzzyART:
         return categories
 
     def _resample_category(self, category, number, s):
-        w = self.w[category]
-        featnum = w.size // 2
-        rand_init = np.random.rand(number, featnum)
-        u, vc = np.split(w, 2)  # can use .getcat_bipole()
-        return u + (1 - vc - u) * rand_init
+        rand_init = np.random.rand(number, self.featnum)
+        u, v = [uv[category] for uv in self.getcat_bipole(s)]
+        return u + (v - u) * rand_init
 
     def replay(self):
         pass
