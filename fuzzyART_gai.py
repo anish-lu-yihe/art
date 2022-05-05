@@ -134,13 +134,25 @@ class FuzzyART:
             categories[i] = self._match_category(sample, rho, s)
         return categories
 
-    def _resample_category(self, category, number, s):
+    def _resample_fromuv(self, u, v, number):
         rand_init = np.random.rand(number, self.featnum)
-        u, v = [uv[category] for uv in self.getcat_bipole(s)]
         return u + (v - u) * rand_init
 
-    def replay(self):
-        pass
+    def _resample_category(self, category, number, s):
+        u, v = [uv[category] for uv in self.getcat_bipole(s)]
+        return self._resample_fromuv(u, v, number)
+
+    def replay(self, category, total_number, s, scheme='in-box'):
+        if scheme == 'in-box':
+            allidx = np.atleast_1d(category)
+            replay_percat = total_number // allidx.size
+            replay = np.empty((0, self.featnum))
+            for catidx in allidx:
+                catreplay = self._resample_category(catidx, replay_percat, s)
+                replay = np.vstack((replay, catreplay))
+        elif scheme == 'vertex':
+            pass
+        return replay
 
     def getcat_bipole(self, s=None):
         _w = self._scale_weight(s)
