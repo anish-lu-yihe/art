@@ -1,6 +1,21 @@
-import numpy as np
+from kit_handy import *
 from sklearn.decomposition import PCA
 from scipy.spatial import ConvexHull
+from scipy.stats import sem
+
+class VisualiseReplay:
+    def __init__(self, data_ref):
+        self.data_ref = np.array(data_ref)
+        self.data_dim = self.data_ref.shape[1]
+
+    def distance_to_truth(self, ax, replay, hist_bins=100, hist_range_top=1):
+        norm_l1 = least_l1_to_data(replay, self.data_ref) / self.data_dim
+        ax.hist(norm_l1, bins=hist_bins, range=(0, hist_range_top), density=0, orientation='horizontal')
+
+        dist_avg = np.mean(norm_l1)
+        dist_sem = sem(norm_l1)
+        return dist_avg, dist_sem
+
 
 
 class PaintPCA:
