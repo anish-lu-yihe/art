@@ -52,6 +52,14 @@ class FuzzyART:
             raise ValueError("Wrong scaling parameter!")
         return _w
 
+    def _getuv(self, s):
+        _w = self._scale_weight(s)
+        _u, _vc = np.split(_w, 2, axis=1)
+        return _u, 1 - _vc
+
+    def _getct(self):
+        return np.mean(self._getuv(None), axis=0)
+
     def _add_category(self, x):
         self.w = np.vstack((self.w, x))
 
@@ -97,6 +105,14 @@ class FuzzyART:
             featidx = np.random.randint(w.size)
         self.w[category, featidx] = beta * sample[featidx] + (1 - beta) * w[featidx]
 
+    def _resample_fromuv(self, u, v, number):
+        rand_init = np.random.rand(number, self.featnum)
+        return u + (v - u) * rand_init
+
+    def _resample_category(self, category, number, s):
+        u, v = [uv[category] for uv in self._getuv(s)]
+        return self._resample_fromuv(u, v, number)
+
     def train(self, x, epochs=1, rho=None, alpha=None, s=None):
         """
         :param x: 2d array of size (samples, features), where all features are
@@ -134,14 +150,6 @@ class FuzzyART:
             categories[i] = self._match_category(sample, rho, s)
         return categories
 
-    def _resample_fromuv(self, u, v, number):
-        rand_init = np.random.rand(number, self.featnum)
-        return u + (v - u) * rand_init
-
-    def _resample_category(self, category, number, s):
-        u, v = [uv[category] for uv in self.getcat_bipole(s)]
-        return self._resample_fromuv(u, v, number)
-
     def replay(self, category, total_number, s, scheme='in-box'):
         if scheme is None:
             u, vc = np.split(np.min(self._scale_weight(s), axis=0), 2)
@@ -157,16 +165,15 @@ class FuzzyART:
             pass
         return replay
 
+    # for external uses, maybe deprecated later
     def getcat_bipole(self, s=None):
-        _w = self._scale_weight(s)
-        _u, _vc = np.split(_w, 2, axis=1)
-        return _u, 1 - _vc
+        return self._getuv(s)
 
     def getcat_centre(self):
-        return np.add(*self.getcat_bipole()) / 2
+        return self._getct()
 
     def getcat_vertex(self, s=None):
-        u, v = self.getcat_bipole(s)
+        u, v = self._getuv(s)
         vertnum = 2 ** self.featnum
         vertices = np.zeros((self.w.shape[0], vertnum, self.featnum))
         for featidx in range(self.featnum):
