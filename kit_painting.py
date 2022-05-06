@@ -20,6 +20,10 @@ class VisualiseReplay:
         [ax.axhline(d, ls=s) for d, s in zip((dist_median, dist_mean, dist_95tile), ('solid', 'dashdot', 'dotted'))]
         return dist_mean, dist_median, dist_95tile
 
+    def properties_of_memory(self, ax, FuzzyART):
+        pass
+
+
 
 class PaintPCA:
     def __init__(self, data_ref):
