@@ -22,6 +22,7 @@ class VisualiseReplay:
 
     def properties_of_memory(self, ax, FuzzyART):
         pass
+    # size
 
 
 
