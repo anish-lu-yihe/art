@@ -168,15 +168,19 @@ class FuzzyART:
             categories[i] = self._match_category(sample, rho, s)
         return categories
 
-    def replay_null(self, total_number, s):
+    def replay_null(self, total_number, s=0):
         u, vc = np.split(np.min(self._scale_weight(s), axis=0), 2)
         replay = self._resample_fromuv(u, 1 - vc, total_number)
         label_exp = np.full(total_number, -1)
         return replay, label_exp
 
-    def replay_1cat(self, category, total_number, s, scheme='in-box'):
+    def replay_allcat(self, total_number, s=0, scheme='in-box'):
+        catnum = self.w.shape[0]
+        replay_percat = total_number // catnum
+        return self.replay_1cat(np.arange(catnum), replay_percat, s, scheme)
+
+    def replay_1cat(self, category, replay_percat, s, scheme='in-box'):
         allidx = np.atleast_1d(category)
-        replay_percat = total_number // allidx.size
         replay = np.empty((0, self.featnum))
         label_exp = np.empty((0, 0), dtype=int)
         if scheme == 'in-box':
