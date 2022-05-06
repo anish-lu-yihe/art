@@ -18,7 +18,7 @@ class VisualiseReplay:
         dist_median = np.median(norm_l1)
         dist_95tile = np.percentile(norm_l1, 95)
         [ax.axhline(d, ls=s) for d, s in zip((dist_median, dist_mean, dist_95tile), ('solid', 'dashdot', 'dotted'))]
-        return dist_mean, dist_median
+        return dist_mean, dist_median, dist_95tile
 
 
 class PaintPCA:
