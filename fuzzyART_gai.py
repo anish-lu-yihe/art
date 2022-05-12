@@ -127,6 +127,7 @@ class FuzzyART:
         return self._resample_fromuv(u, v, number)
 
     def _resample_vertex(self, category, number, s):
+        # for high-d case, may worth sample randomly, as replay number << num_vertex
         vertices = self._getvx(s)[category]
         np.random.shuffle(vertices)
         return vertices[:number]
@@ -178,6 +179,10 @@ class FuzzyART:
         catnum = self.w.shape[0]
         replay_percat = total_number // catnum
         return self.replay_1cat(np.arange(catnum), replay_percat, s, scheme)
+
+    def replay_randcat(self, total_number, s=0, scheme='in-box'):
+        catidx = np.random.randint(self.w.shape[0], size=total_number)
+        return self.replay_1cat(catidx, 1, s, scheme)
 
     def replay_1cat(self, category, replay_percat, s, scheme='in-box'):
         allidx = np.atleast_1d(category)
