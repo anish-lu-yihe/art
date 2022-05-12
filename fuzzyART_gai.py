@@ -97,7 +97,7 @@ class FuzzyART:
             cat_num = np.minimum(self.match_num, threshold.size)
             best_cat[:cat_num] = np.flip(best_idx[-cat_num:])
         else:
-            best_cat = np.argmax(scores),
+            best_cat = np.argmax(scores).astype(int),
             if not threshold[best_cat]:
                 best_cat = -1,
         return best_cat
