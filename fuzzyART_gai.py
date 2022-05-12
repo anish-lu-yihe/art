@@ -44,6 +44,13 @@ class FuzzyART:
     def _scale_weight(self, s):
         if s is None:
             _w = self.w
+        else:
+            _w = self.w + s
+        return _w
+
+    def _scale_weight_wrt_size(self, s):
+        if s is None:
+            _w = self.w
         elif s <= 0.5:
             u, vc = np.hsplit(self.w, 2)  # w = (u, v^c) where u and v are bipoles of hyperbox
             sDvu = s * (1 - vc - u)
