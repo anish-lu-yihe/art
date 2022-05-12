@@ -206,7 +206,7 @@ class FuzzyART:
         replay, label_replay = self.replay_randcat(total_number, s, scheme)
         label_test = self.test(replay, rho, s)[:, 0]
         consistent = label_replay == label_test
-        label_unlearn = np.where(consistent, -1, label_test)  # -1 means both test unknown and inconsistent
+        label_unlearn = np.where(consistent, -1, label_replay)  # -1 means both test unknown and inconsistent
         return replay, label_unlearn
 
 
