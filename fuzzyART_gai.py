@@ -164,7 +164,7 @@ class FuzzyART:
 
         samples = self._complement_code(np.atleast_2d(x))
 
-        categories = np.zeros((samples.shape[0], self.match_num))
+        categories = np.zeros((samples.shape[0], self.match_num), dtype=int)
         for i, sample in enumerate(samples):
             categories[i] = self._match_category(sample, rho, s)
         return categories
@@ -201,6 +201,16 @@ class FuzzyART:
 
         randidx = np.random.permutation(replay.shape[0])
         return replay[randidx], label_exp[randidx]
+
+    def replay_self_consistency(self, total_number, rho=None, s=0, scheme='in-box'):
+        replay, label_replay = self.replay_randcat(total_number, s, scheme)
+        label_test = self.test(replay, rho, s)[:, 0]
+        consistent = label_replay == label_test
+        label_unlearn = np.where(consistent, -1, label_test)  # -1 means both test unknown and inconsistent
+        return replay, label_unlearn
+
+
+
 
     # for external uses, maybe deprecated later
     def getcat_bipole(self, s=None):
