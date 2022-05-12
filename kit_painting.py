@@ -77,8 +77,10 @@ class PaintPCA:
                 print("Category {} is too small".format(catidx))
             else:
                 pca_cv = self._transform(catvert)
-                cathull = ConvexHull(pca_cv)
-                # the above line may run into an error when all the points are on a line, not forming a convexhull
+                try:
+                    cathull = ConvexHull(pca_cv)
+                except:
+                    print('Convex hull cannot be found due to linear dependence of all points.')
                 hullxy = np.append(cathull.vertices, cathull.vertices[0])
                 ax.plot(pca_cv[hullxy, 0], pca_cv[hullxy, 1], '--')
 
