@@ -186,8 +186,12 @@ class FuzzyART:
         return replay, label_gen
 
     def replay_randfeat(self, total_number, s=0, conservative=True, scheme='in-box'):
-        label_gen = self.replay_null(total_number, s, conservative)[0]
-        return self.replay_1cat(label_gen, 1, s, scheme)
+        rand_int = self.replay_null(total_number, s, conservative)[0]
+        label_gen = self.test(rand_int, rho=None, s=s)
+        print(label_gen)
+        x = self.replay_1cat(label_gen, 1, s, scheme)
+        print(x)
+        return x
 
     def replay_allcat(self, total_number, s=0, scheme='in-box'):
         catnum = self.w.shape[0]
