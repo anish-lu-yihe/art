@@ -188,10 +188,7 @@ class FuzzyART:
     def replay_randfeat(self, total_number, s=0, conservative=True, scheme='in-box'):
         rand_int = self.replay_null(total_number, s, conservative)[0]
         label_gen = self.test(rand_int, rho=None, s=s)
-        print(label_gen)
-        x = self.replay_1cat(label_gen, 1, s, scheme)
-        print(x)
-        return x
+        return self.replay_1cat(label_gen, 1, s, scheme)
 
     def replay_allcat(self, total_number, s=0, scheme='in-box'):
         catnum = self.w.shape[0]
@@ -213,7 +210,10 @@ class FuzzyART:
         else:
             raise TypeError("Replay scheme does NOT exist!")
         for catidx in allidx:
-            catreplay = _resample(catidx, replay_percat, s)
+            if catidx == -1:
+                catreplay = self.replay_null(1, s, conservative=True)[0]
+            else:
+                catreplay = _resample(catidx, replay_percat, s)
             replay = np.vstack((replay, catreplay))
             label_gen = np.append(label_gen, np.full((catreplay.shape[0], 1), catidx))
 
