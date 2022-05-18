@@ -220,8 +220,11 @@ class FuzzyART:
         randidx = np.random.permutation(replay.shape[0])
         return replay[randidx], label_gen[randidx]
 
-    def replay_self_consistency(self, total_number, rho=None, s=0, scheme='in-box'):
-        replay, label_replay = self.replay_randcat(total_number, s, scheme)
+    def replay_self_consistency(self, total_number, rho=None, s=0, pathway='top-down', conservative=True, scheme='in-box'):
+        if pathway == 'top-down':
+            replay, label_replay = self.replay_randcat(total_number, s, scheme)
+        elif pathway == 'bottom-up':
+            replay, label_replay = self.replay_randfeat(total_number, s, conservative, scheme)
         label_test = self.test(replay, rho, s)[:, 0]
         consistent = label_replay == label_test
         label_unlearn = np.where(consistent, -1, label_replay)  # -1 means both test unknown and inconsistent
