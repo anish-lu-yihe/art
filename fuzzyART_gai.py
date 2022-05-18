@@ -176,11 +176,14 @@ class FuzzyART:
             categories[i] = self._match_category(sample, rho, s)
         return categories
 
-    def replay_null(self, total_number, s=0):
-        u, vc = np.split(np.min(self._scale_weight(s), axis=0), 2)
+    def replay_null(self, total_number, s=0, conservative=True):
+        if conservative:  # feature ranges limited by prior knowledge
+            u, vc = np.split(np.min(self._scale_weight(s), axis=0), 2)
+        else:
+            u, vc = 0, 0
         replay = self._resample_fromuv(u, 1 - vc, total_number)
-        label_exp = np.full(total_number, -1)
-        return replay, label_exp
+        label_gen = np.full(total_number, -1)
+        return replay, label_gen
 
     def replay_allcat(self, total_number, s=0, scheme='in-box'):
         catnum = self.w.shape[0]
@@ -194,7 +197,7 @@ class FuzzyART:
     def replay_1cat(self, category, replay_percat, s, scheme='in-box'):
         allidx = np.atleast_1d(category)
         replay = np.empty((0, self.featnum))
-        label_exp = np.empty((0, 0), dtype=int)
+        label_gen = np.empty((0, 0), dtype=int)
         if scheme == 'in-box':
             _resample = self._resample_category
         elif scheme == 'vertex':
@@ -204,10 +207,10 @@ class FuzzyART:
         for catidx in allidx:
             catreplay = _resample(catidx, replay_percat, s)
             replay = np.vstack((replay, catreplay))
-            label_exp = np.append(label_exp, np.full((catreplay.shape[0], 1), catidx))
+            label_gen = np.append(label_gen, np.full((catreplay.shape[0], 1), catidx))
 
         randidx = np.random.permutation(replay.shape[0])
-        return replay[randidx], label_exp[randidx]
+        return replay[randidx], label_gen[randidx]
 
     def replay_self_consistency(self, total_number, rho=None, s=0, scheme='in-box'):
         replay, label_replay = self.replay_randcat(total_number, s, scheme)
