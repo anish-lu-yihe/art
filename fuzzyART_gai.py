@@ -230,14 +230,13 @@ class FuzzyART:
             replay, label_replay = self.replay_randcat(total_number, s, scheme)
         elif pathway == 'bottom-up':
             replay, label_replay = self.replay_randfeat(total_number, s, conservative, scheme)
-        label_test = self.test(replay, rho, s)[:, 0]
+        label_test = self.test(replay, rho, s=0)[:, 0]
         return replay, label_replay, label_test
 
-    def unlearn_from_replay(self, replay, label1, label2, beta=1, whichidx='least-loss'):
-        consistent = label1 == label2
-        label_unlearn = np.where(consistent, -1, label2)  # -1 means both test unknown and inconsistent
-        for catidx, sample in zip(label_unlearn, replay):
-            self._contraction(catidx, self._complement_code(sample), beta, whichidx)
+    def unlearn_from_overlap(self, sample, label_nochange, label_unlearn, beta=1, whichidx='least-loss'):
+        _label_unlearn = np.where(label_nochange == label_unlearn, -1, label_unlearn)  # -1 means both test unknown and inconsistent
+        for catidx, x in zip(_label_unlearn, self._complement_code(sample)):
+            self._contraction(catidx, x, beta, whichidx)
 
 
 
