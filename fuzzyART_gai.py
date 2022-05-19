@@ -125,7 +125,10 @@ class FuzzyART:
                 featidx = np.argmin(sample - w)
             elif whichidx == 'random':
                 featidx = np.random.randint(w.size)
-            self.w[category, featidx] = beta * sample[featidx] + (1 - beta) * w[featidx]
+            else:
+                raise TypeError('The contraction method is unknown!')
+            if sample[featidx] > w[featidx]:
+                self.w[category, featidx] = beta * sample[featidx] + (1 - beta) * w[featidx]
 
     def _resample_fromuv(self, u, v, number):
         rand_init = np.random.rand(number, self.featnum)
