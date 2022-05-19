@@ -109,14 +109,14 @@ class FuzzyART:
                 best_cat = -1,
         return best_cat
 
-    def _expansion(self, category, sample, alpha):
+    def _expansion(self, category, x, alpha):
         if category != -1:
             if alpha is None:
                 _alpha = self.alpha
             else:
                 _alpha = alpha
             w = self.w[category]
-            self.w[category] = _alpha * np.minimum(sample, w) + (1 - _alpha) * w
+            self.w[category] = _alpha * np.minimum(x, w) + (1 - _alpha) * w
 
     def _contraction(self, category, y, beta, whichidx='least-loss'):
         if category != -1:
