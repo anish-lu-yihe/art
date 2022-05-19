@@ -118,13 +118,13 @@ class FuzzyART:
             w = self.w[category]
             self.w[category] = _alpha * np.minimum(sample, w) + (1 - _alpha) * w
 
-    def _contraction(self, category, sample, beta, whichidx='least-loss'):
+    def _contraction(self, category, y, beta, whichidx='least-loss'):
         if category != -1:
             w = self.w[category]
             if whichidx == 'least-loss':  # index leading to least loss of categorical hyperbox area
-                featidx = np.argmin(sample - w)
+                featidx = np.argmin(y - w)
             elif whichidx == 'norm-least-loss':  # least loss normalised wrt dimensional length
-                loss = sample - w
+                loss = y - w
                 u, vc = np.hsplit(w, 2)
                 dlen = np.tile(1 - vc - u, 2)
                 featidx = np.argmin(np.divide(loss, dlen))
@@ -132,8 +132,8 @@ class FuzzyART:
                 featidx = np.random.randint(w.size)
             else:
                 raise TypeError('The contraction method is unknown!')
-            if sample[featidx] > w[featidx]:
-                self.w[category, featidx] = beta * sample[featidx] + (1 - beta) * w[featidx]
+            if y[featidx] > w[featidx]:
+                self.w[category, featidx] = beta * y[featidx] + (1 - beta) * w[featidx]
 
     def _resample_fromuv(self, u, v, number):
         rand_init = np.random.rand(number, self.featnum)
