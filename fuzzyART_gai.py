@@ -123,6 +123,11 @@ class FuzzyART:
             w = self.w[category]
             if whichidx == 'least-loss':  # index leading to least loss of categorical hyperbox area
                 featidx = np.argmin(sample - w)
+            elif whichidx == 'norm-least-loss':  # least loss normalised wrt dimensional length
+                loss = sample - w
+                u, vc = np.hsplit(w, 2)
+                dlen = np.tile(1 - vc - u, 2)
+                featidx = np.argmin(np.divide(loss, dlen))
             elif whichidx == 'random':
                 featidx = np.random.randint(w.size)
             else:
