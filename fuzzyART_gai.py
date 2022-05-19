@@ -110,20 +110,22 @@ class FuzzyART:
         return best_cat
 
     def _expansion(self, category, sample, alpha):
-        if alpha is None:
-            _alpha = self.alpha
-        else:
-            _alpha = alpha
-        w = self.w[category]
-        self.w[category] = _alpha * np.minimum(sample, w) + (1 - _alpha) * w
+        if category != -1:
+            if alpha is None:
+                _alpha = self.alpha
+            else:
+                _alpha = alpha
+            w = self.w[category]
+            self.w[category] = _alpha * np.minimum(sample, w) + (1 - _alpha) * w
 
     def _contraction(self, category, sample, beta, whichidx='least-loss'):
-        w = self.w[category]
-        if whichidx == 'least-loss':  # index leading to least loss of categorical hyperbox area
-            featidx = np.argmin(sample - w)
-        elif whichidx == 'random':
-            featidx = np.random.randint(w.size)
-        self.w[category, featidx] = beta * sample[featidx] + (1 - beta) * w[featidx]
+        if category != -1:
+            w = self.w[category]
+            if whichidx == 'least-loss':  # index leading to least loss of categorical hyperbox area
+                featidx = np.argmin(sample - w)
+            elif whichidx == 'random':
+                featidx = np.random.randint(w.size)
+            self.w[category, featidx] = beta * sample[featidx] + (1 - beta) * w[featidx]
 
     def _resample_fromuv(self, u, v, number):
         rand_init = np.random.rand(number, self.featnum)
@@ -230,10 +232,9 @@ class FuzzyART:
 
     def unlearn_from_replay(self, replay, label1, label2, beta=1, whichidx='least-loss'):
         consistent = label1 == label2
-        label_unlearn = np.where(consistent, -1, label1)  # -1 means both test unknown and inconsistent
+        label_unlearn = np.where(consistent, -1, label2)  # -1 means both test unknown and inconsistent
         for catidx, sample in zip(label_unlearn, replay):
-            if catidx != -1:
-                self._contraction(catidx, self._complement_code(sample), beta, whichidx)
+            self._contraction(catidx, self._complement_code(sample), beta, whichidx)
 
 
 
