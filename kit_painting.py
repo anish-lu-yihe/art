@@ -10,14 +10,14 @@ class VisualiseReplay:
         self.data_ref = np.array(data_ref)
         self.data_dim = self.data_ref.shape[1]
 
-    def distance_to_truth(self, ax, replay, hist_bins=100, hist_range_top=1):
+    def distance_to_truth(self, ax, replay):
         norm_l1 = least_l1_to_data(replay, self.data_ref) / self.data_dim
-        ax.hist(norm_l1, bins=hist_bins, range=(0, hist_range_top), density=True, orientation='horizontal', alpha=.4)
+        ax.hist(norm_l1, bins='auto', orientation='horizontal', alpha=.4)
 
         dist_mean = np.mean(norm_l1)
         dist_median = np.median(norm_l1)
         dist_95tile = np.percentile(norm_l1, 95)
-        [ax.axhline(d, ls=s) for d, s in zip((dist_median, dist_mean, dist_95tile), ('solid', 'dashdot', 'dotted'))]
+        [ax.axhline(d, ls=s, color='k') for d, s in zip((dist_median, dist_mean, dist_95tile), ('solid', 'dashdot', 'dotted'))]
         return dist_mean, dist_median, dist_95tile
 
     def properties_of_memory(self, ax, FuzzyART):
