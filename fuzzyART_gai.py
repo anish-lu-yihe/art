@@ -80,6 +80,10 @@ class FuzzyART:
 
         return vertices
 
+    def _getSize(self):
+        u, v = self._getuv(0)
+        return l1_norm(v - u)
+
     def _add_category(self, x):
         self.w = np.vstack((self.w, x))
 

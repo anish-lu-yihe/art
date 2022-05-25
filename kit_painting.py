@@ -20,9 +20,12 @@ class VisualiseReplay:
         [ax.axhline(d, ls=s, color='k') for d, s in zip((dist_median, dist_mean, dist_95tile), ('solid', 'dashdot', 'dotted'))]
         return dist_mean, dist_median, dist_95tile
 
-    def properties_of_memory(self, ax, FuzzyART):
-        pass
-    # size
+    def properties_of_memory(self, FuzzyART, ax):
+        cat_num = FuzzyART.w.shape[0]
+        cat_size = FuzzyART._getSize()
+        if ax is not None:
+            print('draw hist')
+        return cat_num, cat_size
 
 
 
