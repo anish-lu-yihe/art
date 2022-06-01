@@ -1,5 +1,6 @@
 import numpy as np
 
+import seaborn as sns
 from kit_handy import *
 from sklearn.decomposition import PCA
 from scipy.spatial import ConvexHull
@@ -10,21 +11,23 @@ class VisualiseReplay:
         self.data_ref = np.array(data_ref)
         self.data_dim = self.data_ref.shape[1]
 
-    def distance_to_truth(self, ax, replay):
+    def distance_to_truth(self, ax_hist, replay):
         norm_l1 = least_l1_to_data(replay, self.data_ref) / self.data_dim
-        ax.hist(norm_l1, bins='auto', orientation='horizontal', alpha=.4)
-
         dist_mean = np.mean(norm_l1)
         dist_median = np.median(norm_l1)
         dist_95tile = np.percentile(norm_l1, 95)
-        [ax.axhline(d, ls=s, color='k') for d, s in zip((dist_median, dist_mean, dist_95tile), ('solid', 'dashdot', 'dotted'))]
+
+        if ax_hist is not None:
+            sns.kdeplot(y=norm_l1, fill=True, bw_adjust=.1, clip=[0, 1], ax=ax_hist)
+            [ax_hist.axhline(d, ls=s, color='k') for d, s in zip((dist_median, dist_mean, dist_95tile), ('solid', 'dashdot', 'dotted'))]
         return dist_mean, dist_median, dist_95tile
 
-    def properties_of_memory(self, FuzzyART, ax):
+    def properties_of_memory(self, ax, FuzzyART):
         cat_num = FuzzyART.w.shape[0]
         cat_size = FuzzyART._getSize()
+
         if ax is not None:
-            print('draw hist')
+            ax.hist(cat_size, bins='auto', orientation='horizontal', alpha=.4)
         return cat_num, cat_size
 
 
