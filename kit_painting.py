@@ -22,13 +22,26 @@ class VisualiseReplay:
             [ax_hist.axhline(d, ls=s, color='k') for d, s in zip((dist_median, dist_mean, dist_95tile), ('solid', 'dashdot', 'dotted'))]
         return dist_mean, dist_median, dist_95tile
 
-    def properties_of_memory(self, ax, FuzzyART):
+    def property_of_memory(self, ax, FuzzyART):
         cat_num = FuzzyART.w.shape[0]
         cat_size = FuzzyART._getSize()
+        point_cat_idx = np.flatnonzero(cat_size)
+        point_cat_num = cat_num - point_cat_idx.size
 
         if ax is not None:
-            ax.hist(cat_size, bins='auto', orientation='horizontal', alpha=.4)
-        return cat_num, cat_size
+            bin_num = 3
+            bin_uplim = np.max(cat_size) / 2 ** np.arange(bin_num - 1, -1, -1)
+            bin_idx = np.digitize(cat_size[point_cat_idx], bins=bin_uplim, right=True)
+            bin_count = np.unique(bin_idx, return_counts=True)
+            bar_count = np.zeros(bin_num + 1, dtype=int)
+            bar_count[bin_count[0] + 1] = bin_count[1]
+            bar_count[0] = point_cat_num
+            bar_label = np.insert(bin_uplim, 0, 0)
+            ax.barh(np.arange(bin_num + 1), bar_count, alpha=.4)
+            ax.set_yticks(np.arange(bin_num + 1))
+            ax.set_yticklabels(bar_label.round(2))
+            ax.set_xticks(np.arange(np.max(bar_count) + 1))
+        return cat_size, cat_num, point_cat_num
 
 
 
