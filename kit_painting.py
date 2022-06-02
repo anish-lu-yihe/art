@@ -25,6 +25,8 @@ class VisualiseReplay:
     def property_of_memory(self, ax, FuzzyART):
         cat_num = FuzzyART.w.shape[0]
         cat_size = FuzzyART._getSize()
+        size_mean = np.mean(cat_size)
+        size_median = np.median(cat_size)
         point_cat_idx = np.flatnonzero(cat_size)
         point_cat_num = cat_num - point_cat_idx.size
 
@@ -41,7 +43,7 @@ class VisualiseReplay:
             ax.set_yticks(np.arange(bin_num + 1))
             ax.set_yticklabels(bar_label.round(2))
             ax.set_xticks(np.arange(np.max(bar_count) + 1))
-        return cat_size, cat_num, point_cat_num
+        return cat_num, point_cat_num, size_mean, size_median
 
 
 
