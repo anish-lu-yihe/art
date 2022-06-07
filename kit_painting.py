@@ -68,15 +68,21 @@ class PaintPCA:
             transformed_data = self.pca.transform(data)
         return transformed_data
 
-    def scatter(self, ax, cat_label, data_new=None):
-        if data_new is None:
-            pca_data = self.pca_data_ref
+    def scatter(self, ax, data, cat_label=None, marker_prop=None):
+        pca_data = self._transform(data)
+        if marker_prop is None:
+            mk_type, mk_color, mk_size, mk_label = None, None, None, None
         else:
-            pca_data = self._transform(data_new)
+            mk_type, mk_color, mk_size, mk_label = marker_prop
 
-        for cat in range(max(cat_label) + 1):
-            ax.scatter(*np.where(cat_label == cat, pca_data.T, None), label=cat)
-        ax.scatter(*np.where(cat_label == -1, pca_data.T, None), color='k', marker='^', label=-1)
+        if cat_label is None:
+            art = ax.scatter(*pca_data.T, marker=mk_type, color=mk_color, s=mk_size, label=mk_label)
+        else:
+            for cat in range(max(cat_label) + 1):
+                art = ax.scatter(*np.where(cat_label == cat, pca_data.T, None), label=cat)
+            art = ax.scatter(*np.where(cat_label == -1, pca_data.T, None), color='k', marker='^', label=-1)
+
+        return art
 
     def tripole(self, ax, s_pole, n_pole):
         """
