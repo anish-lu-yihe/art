@@ -62,21 +62,22 @@ class PaintPCA:
         print(pca_msg)
 
     def _transform(self, data):
+        _data = np.atleast_2d(data)
         if self.noPCA:
-            transformed_data = data
+            transformed_data = _data
         else:
-            transformed_data = self.pca.transform(data)
+            transformed_data = self.pca.transform(_data)
         return transformed_data
 
     def scatter(self, ax, data, cat_label=None, marker_prop=None):
         pca_data = self._transform(data)
         if marker_prop is None:
-            mk_type, mk_color, mk_size, mk_label = None, None, None, None
+            mk_type, mk_color, mk_size = None, None, None
         else:
-            mk_type, mk_color, mk_size, mk_label = marker_prop
+            mk_type, mk_color, mk_size = marker_prop
 
         if cat_label is None:
-            art = ax.scatter(*pca_data.T, marker=mk_type, color=mk_color, s=mk_size, label=mk_label)
+            art = ax.scatter(*pca_data.T, marker=mk_type, color=mk_color, s=mk_size)
         else:
             for cat in range(max(cat_label) + 1):
                 art = ax.scatter(*np.where(cat_label == cat, pca_data.T, None), label=cat)
